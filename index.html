@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azerty - Mon Feed de Posts</title>
+    <style>
+        /* Styles Généraux */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #111827; /* Noir profond */
+            color: #F9FAFB; /* Texte principal */
+            display: flex;
+            flex-direction: column; /* Organise la top-bar et le reste en colonne */
+            min-height: 100vh;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background-color: #1F2937; /* Contenants */
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between; /* Logo à gauche, reste à droite */
+            align-items: center;
+            border-bottom: 1px solid #dd3366; /* Rouge Azerty */
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .top-bar .logo-container {
+            display: flex;
+            align-items: baseline;
+            font-size: 28px;
+            font-weight: bold;
+            color: #F9FAFB; /* Texte principal */
+        }
+
+        .top-bar .logo-container .version {
+            color: #dd3366; /* Rouge Azerty */
+            font-size: 18px;
+            margin-left: 10px;
+            font-weight: normal;
+        }
+
+        .top-bar-right-elements {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .top-bar .mode-switcher {
+            display: flex;
+            background-color: #111827; /* Fond des boutons mode (plus sombre) */
+            border-radius: 0px; /* Carré */
+            padding: 3px;
+            gap: 5px;
+        }
+
+        .top-bar .mode-switcher .mode-button {
+            padding: 5px 12px;
+            border-radius: 0px; /* Carré */
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s, color 0.3s;
+            color: #F9FAFB; /* Texte principal */
+        }
+
+        .top-bar .mode-switcher .mode-button.active {
+            background-color: #dd3366; /* Rouge Azerty */
+            color: white;
+        }
+
+        .top-bar .profile-pic {
+            width: 30px;
+            height: 30px;
+            border-radius: 0px; /* Carré */
+            background-color: #dd3366; /* Rouge Azerty */
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        /* Contenu principal de la mise en page (avec les 3 colonnes) */
+        .page-content {
+            display: flex;
+            flex-grow: 1; /* Prend l'espace restant verticalement */
+            width: 100%;
+        }
+
+        /* Barre Latérale Gauche (Navigation) */
+        .sidebar-left {
+            width: 250px;
+            background-color: #111827; /* Arrière-plan principal */
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex-shrink: 0; /* Empêche de rétrécir */
+        }
+
+        .sidebar-left .nav-button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            border-radius: 0px; /* Carré */
+            background-color: transparent; /* Par défaut, transparent */
+            color: #F9FAFB; /* Texte principal */
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Style spécifique pour le bouton Studio Creator */
+        .sidebar-left .nav-button.studio-creator {
+            background-color: #dd3366; /* Rouge Azerty */
+            color: white;
+            font-weight: bold;
+        }
+        .sidebar-left .nav-button.studio-creator:hover {
+            background-color: #bb2255; /* Nuance plus foncée de rouge au survol */
+        }
+
+        .sidebar-left .nav-button:hover,
+        .sidebar-left .nav-button.active {
+            background-color: #dd3366; /* Rouge Azerty */
+            color: #FFFFFF;
+        }
+
+        .sidebar-left .nav-button.active {
+            font-weight: bold;
+            background-color: #dd3366; /* Rouge Azerty */
+            color: white;
+        }
+        
+        .sidebar-left .nav-button i { /* Icônes (fausses, pour l'exemple) */
+            font-size: 20px;
+        }
+
+        .sidebar-left .solde {
+            margin-top: 20px;
+            padding: 15px 15px; /* Ajusté padding pour bordures */
+            background-color: transparent; /* Transparent, prend le fond de la sidebar */
+            border-radius: 0px; /* Carré */
+            font-size: 15px;
+            border-top: 1px solid #dd3366; /* Rouge Azerty */
+            border-bottom: 1px solid #dd3366; /* Rouge Azerty */
+            color: #9CA3AF; /* Texte secondaire pour "Solde:" */
+        }
+
+        .sidebar-left .solde span {
+            color: #FFD700; /* Or pour le solde (similaire au jaune) */
+            font-weight: bold;
+        }
+
+        /* Contenu Principal (Flux + Sidebar Droite) */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            box-sizing: border-box; /* Inclure padding dans la largeur */
+        }
+
+        .flux-section {
+            flex-grow: 1;
+            background-color: #1F2937; /* Contenants */
+            border-radius: 0px; /* Carré */
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            min-width: 0; /* Permet le shrinking pour le flex */
+        }
+
+        .flux-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .flux-header h2 {
+            font-size: 24px;
+            margin: 0;
+            color: #F9FAFB; /* Texte principal */
+        }
+
+        .flux-header .post-button {
+             background-color: #dd3366; /* Rouge Azerty */
+             color: white;
+             padding: 10px 20px;
+             border: none;
+             border-radius: 0px; /* Carré */
+             cursor: pointer;
+             font-size: 16px;
+         }
+
+        .flux-header .post-button:hover {
+            background-color: #bb2255; /* Nuance plus foncée de rouge au survol */
+        }
+        
+        .flux-header .post-button:disabled {
+            background-color: #9CA3AF; /* Gris pour désactivé */
+            cursor: not-allowed;
+        }
+
+        .post-item {
+            background-color: #111827; /* Arrière-plan principal */
+            border-radius: 0px; /* Carré */
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            color: #F9FAFB; /* Texte principal */
+        }
+
+        .post-item p {
+            margin: 0 0 10px 0;
+            line-height: 1.6;
+        }
+
+        .post-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0px; /* Carré */
+            margin-top: 10px;
+            display: block;
+        }
+
+        /* Barre Latérale Droite (Abonnements / Suggestions) */
+        .sidebar-right {
+            width: 280px;
+            background-color: #1F2937; /* Contenants */
+            padding: 20px;
+            box-sizing: border-box;
+            border-radius: 0px; /* Carré */
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-right h3 {
+            margin-top: 0;
+            color: #F9FAFB; /* Texte principal */
+            font-size: 18px;
+            border-bottom: 1px solid #dd3366; /* Rouge Azerty */
+            padding-bottom: 10px;
+        }
+
+        .sidebar-right .no-subscriptions-message {
+            color: #9CA3AF; /* Texte secondaire */
+            font-style: italic;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .user-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .user-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        .user-list .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 0px; /* Carré */
+            background-color: #9CA3AF; /* Gris clair pour les avatars par défaut */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #1F2937; /* Texte sombre sur avatar */
+            font-weight: bold;
+        }
+
+        .user-list .username {
+            color: #F9FAFB; /* Texte principal */
+        }
+
+        .user-list .username.verified {
+            color: #dd3366; /* Rouge Azerty */
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #1F2937; /* Contenants pour la modale */
+            color: #F9FAFB; /* Texte principal */
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #dd3366; /* Rouge Azerty */
+            width: 80%;
+            max-width: 500px;
+            border-radius: 0px; /* Carré */
+            position: relative;
+        }
+
+        .close-button {
+            color: #9CA3AF; /* Gris clair */
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        textarea {
+            width: 95%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #dd3366; /* Rouge Azerty */
+            border-radius: 0px; /* Carré */
+            resize: vertical;
+            background-color: #111827; /* Arrière-plan principal */
+            color: #F9FAFB; /* Texte principal */
+        }
+
+        input[type="text"] {
+            width: 95%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #dd3366; /* Rouge Azerty */
+            border-radius: 0px; /* Carré */
+            background-color: #111827; /* Arrière-plan principal */
+            color: #F9FAFB; /* Texte principal */
+        }
+
+        .publish-button {
+            background-color: #dd3366; /* Rouge Azerty */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 0px; /* Carré */
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .publish-button:hover {
+            background-color: #bb2255; /* Nuance plus foncée de rouge au survol */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .top-bar {
+                flex-wrap: wrap; /* Permet aux éléments de passer à la ligne */
+                justify-content: center;
+                gap: 10px;
+            }
+            .top-bar .logo-container {
+                width: 100%; /* Prend toute la largeur sur mobile */
+                text-align: center;
+                margin-bottom: 10px;
+            }
+            .top-bar-right-elements {
+                width: 100%;
+                justify-content: center;
+            }
+            .page-content {
+                flex-direction: column;
+            }
+            .sidebar-left {
+                width: 100%;
+                padding: 10px;
+                flex-direction: row;
+                justify-content: space-around;
+                border-bottom: 1px solid #dd3366; /* Rouge Azerty */
+            }
+            .sidebar-left .logo-container {
+                display: none; /* Cache le logo dans la sidebar sur mobile si déjà en haut */
+            }
+            .sidebar-left .solde {
+                display: none;
+            }
+            .main-content {
+                flex-direction: column;
+                max-width: 100%;
+                padding: 10px;
+            }
+            .sidebar-right {
+                width: 100%;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="logo-container">
+            <span>Azerty</span>
+            <span class="version">2.5 vPRO</span>
+        </div>
+        <div class="top-bar-right-elements">
+            <div class="mode-switcher">
+                <div class="mode-button active">☀️ Clair</div>
+                <div class="mode-button">🌙 Sombre</div>
+            </div>
+            <div class="profile-pic" id="profilePic">LS</div> </div>
+    </div>
+
+    <div class="page-content">
+        <div class="sidebar-left">
+            <a href="#" class="nav-button studio-creator"><i class="fa fa-home"></i> Studio Creator</a>
+            
+            <div id="authButtonsContainer">
+                </div>
+
+            <div class="solde">
+                Solde: <span>7225.05 AZ$</span>
+            </div>
+            <a href="#" class="nav-button active"><i class="fa fa-feed"></i> Flux</a>
+            <a href="#" class="nav-button"><i class="fa fa-compass"></i> Discover</a>
+            <a href="#" class="nav-button"><i class="fa fa-lightbulb"></i> Az IA</a>
+            <a href="#" class="nav-button"><i class="fa fa-comments"></i> Discussions</a>
+            <a href="#" class="nav-button"><i class="fa fa-shopping-cart"></i> Shop</a>
+            <a href="#" class="nav-button"><i class="fa fa-user"></i> Profil</a>
+        </div>
+
+        <div class="main-content">
+            <div class="flux-section">
+                <div class="flux-header">
+                    <h2>Flux</h2>
+                    <button id="postButton" class="post-button">Connectez-vous pour poster</button>
+                </div>
+                <div class="feed" id="postFeed">
+                    </div>
+            </div>
+
+            <div class="sidebar-right">
+                <h3>Abonnements</h3>
+                <div class="no-subscriptions-message">Aucun abonnement</div>
+
+                <h3>Suggestions</h3>
+                <ul class="user-list">
+                    <li><div class="avatar">L</div><span class="username">LGL097</span></li>
+                    </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="closeModal">&times;</span>
+            <h2>Créer un nouveau Post</h2>
+            <textarea id="postText" placeholder="Écrivez votre texte ici..."></textarea>
+            <input type="text" id="postImage" placeholder="Collez l'URL de l'image (facultatif)">
+            <button id="publishPost" class="publish-button">Publier</button>
+        </div>
+    </div>
+
+    <script type="module">
+      // 1. LES IMPORTS DE FIREBASE
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+      import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+      // 2. TA CONFIGURATION FIREBASE (copiée de ton projet AzertyDATABASE)
+      const firebaseConfig = {
+        apiKey: "AIzaSyDFISgvNFALLg-RzpieOatjG22Sup3Apo",
+        authDomain: "azertydatabase.firebaseapp.com",
+        projectId: "azertydatabase",
+        storageBucket: "azertydatabase.appspot.com",
+        messagingSenderId: "771745261765",
+        appId: "1:771745261765:web:eab0ae0f662fd975ca28ac"
+      };
+
+      // 3. INITIALISATION DE FIREBASE ET FIRESTORE
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      // 4. LE RESTE DE TON CODE JAVASCRIPT (MODIFIÉ POUR FIREBASE)
+      const openModalButton = document.getElementById('openModal'); // Ancien ID, il faut le mettre à jour
+      const postButton = document.getElementById('postButton'); // Le bouton "Poster"
+      const closeModalButton = document.getElementById('closeModal');
+      const postModal = document.getElementById('postModal');
+      const publishPostButton = document.getElementById('publishPost');
+      const postText = document.getElementById('postText');
+      const postImage = document.getElementById('postImage');
+      const postFeed = document.getElementById('postFeed');
+      const profilePic = document.getElementById('profilePic');
+      const authButtonsContainer = document.getElementById('authButtonsContainer');
+
+      let currentUser = null; // Variable pour stocker les infos de l'utilisateur connecté
+
+      // Fonction pour vérifier l'état de connexion et mettre à jour l'interface
+      function checkLoginStatus() {
+          const userProfileString = localStorage.getItem('userProfileAzerty');
+          if (userProfileString) {
+              try {
+                  currentUser = JSON.parse(userProfileString);
+                  // Mettre à jour l'avatar dans la top-bar
+                  profilePic.textContent = currentUser.pseudo ? currentUser.pseudo.charAt(0).toUpperCase() : 'AZ';
+                  profilePic.style.backgroundColor = '#dd3366'; // Rouge Azerty si connecté
+
+                  // Rendre le bouton Poster actif
+                  postButton.textContent = 'Poster';
+                  postButton.disabled = false;
+                  postButton.onclick = function() { // Réactiver l'event listener
+                    postModal.style.display = 'flex';
+                  };
+
+                  // Afficher le bouton de déconnexion
+                  authButtonsContainer.innerHTML = `
+                    <a href="#" class="nav-button" id="logoutButton"><i class="fa fa-sign-out"></i> Se déconnecter</a>
+                  `;
+                  document.getElementById('logoutButton').onclick = function() {
+                      localStorage.removeItem('userProfileAzerty');
+                      window.location.reload(); // Recharger la page après déconnexion
+                  };
+
+              } catch (e) {
+                  console.error("Erreur de parsing localStorage userProfileAzerty:", e);
+                  localStorage.removeItem('userProfileAzerty'); // Nettoyer les données corrompues
+                  currentUser = null;
+                  updateLoggedOutUI();
+              }
+          } else {
+              currentUser = null;
+              updateLoggedOutUI();
+          }
+      }
+
+      function updateLoggedOutUI() {
+          // Mettre à jour l'avatar par défaut dans la top-bar
+          profilePic.textContent = 'AZ';
+          profilePic.style.backgroundColor = '#9CA3AF'; // Gris clair si déconnecté
+
+          // Désactiver le bouton Poster
+          postButton.textContent = 'Connectez-vous pour poster';
+          postButton.disabled = true;
+          postButton.onclick = null; // Désactiver l'event listener
+
+          // Afficher les boutons de connexion/création de compte
+          authButtonsContainer.innerHTML = `
+            <a href="/login" class="nav-button"><i class="fa fa-sign-in"></i> Se connecter</a>
+            <a href="/signup" class="nav-button"><i class="fa fa-user-plus"></i> Créer un compte</a>
+          `;
+      }
+
+      // Appeler la fonction au chargement de la page
+      document.addEventListener('DOMContentLoaded', checkLoginStatus);
+
+
+      // --- LOGIQUE FIREBASE ---
+
+      const postsCollection = collection(db, "posts");
+
+      function displayPost(post) {
+          const postItem = document.createElement('div');
+          postItem.classList.add('post-item');
+
+          // Ajoute l'avatar et le nom d'utilisateur avant le texte
+          const postHeader = document.createElement('div');
+          postHeader.style.display = 'flex';
+          postHeader.style.alignItems = 'center';
+          postHeader.style.marginBottom = '10px';
+
+          const avatar = document.createElement('div');
+          avatar.classList.add('avatar');
+          avatar.textContent = post.username ? post.username.charAt(0).toUpperCase() : 'A';
+          avatar.style.width = '30px';
+          avatar.style.height = '30px';
+          avatar.style.fontSize = '14px';
+          avatar.style.marginRight = '8px';
+          avatar.style.borderRadius = '0px'; /* Carré */
+          postHeader.appendChild(avatar);
+
+          const usernameSpan = document.createElement('span');
+          usernameSpan.classList.add('username');
+          usernameSpan.textContent = post.username || 'Utilisateur Azerty'; 
+          if (post.verified) {
+              usernameSpan.classList.add('verified');
+              usernameSpan.textContent += ' ✔️';
+          }
+          postHeader.appendChild(usernameSpan);
+
+          const timestampSpan = document.createElement('span');
+          timestampSpan.style.fontSize = '12px';
+          timestampSpan.style.color = '#9CA3AF'; /* Texte secondaire */
+          timestampSpan.style.marginLeft = '10px';
+          if (post.timestamp) {
+              const date = new Date(post.timestamp);
+              const now = new Date();
+              const diffTime = Math.abs(now - date);
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+              if (diffDays === 0) {
+                  timestampSpan.textContent = 'aujourd\'hui';
+              } else if (diffDays === 1) {
+                  timestampSpan.textContent = 'hier';
+              } else {
+                  timestampSpan.textContent = `il y a ${diffDays} jours`;
+              }
+          }
+          postHeader.appendChild(timestampSpan);
+
+
+          postItem.appendChild(postHeader);
+
+
+          if (post.text && post.text !== '') {
+              const textParagraph = document.createElement('p');
+              textParagraph.textContent = post.text;
+              postItem.appendChild(textParagraph);
+          }
+
+          if (post.imageUrl && post.imageUrl !== '') {
+              const imageElement = document.createElement('img');
+              imageElement.src = post.imageUrl;
+              imageElement.alt = 'Image du post';
+              imageElement.style.borderRadius = '0px'; /* Carré */
+              postItem.appendChild(imageElement);
+          }
+          
+          postFeed.prepend(postItem);
+      }
+
+      const q = query(postsCollection, orderBy("timestamp", "desc")); 
+
+      onSnapshot(q, (snapshot) => {
+          postFeed.innerHTML = '';
+
+          snapshot.forEach((doc) => {
+              const postData = doc.data();
+              // Les données de l'utilisateur dans le post viennent de Firebase
+              displayPost(postData);
+          });
+      });
+
+      // Fermer la modale
+      closeModalButton.onclick = function() {
+          postModal.style.display = 'none';
+          postText.value = '';
+          postImage.value = '';
+      }
+
+      // Fermer la modale si l'utilisateur clique en dehors
+      window.onclick = function(event) {
+          if (event.target == postModal) {
+              postModal.style.display = 'none';
+              postText.value = '';
+              postImage.value = '';
+          }
+      }
+
+      // Publier le post sur Firebase
+      publishPostButton.onclick = async function() { 
+          const text = postText.value.trim();
+          const imageUrl = postImage.value.trim();
+
+          if (text === '' && imageUrl === '') {
+              alert('Veuillez écrire du texte ou insérer une URL d\'image pour publier.');
+              return;
+          }
+          
+          if (!currentUser) {
+              alert('Vous devez être connecté pour poster.');
+              return;
+          }
+
+          const newPost = {
+              text: text,
+              imageUrl: imageUrl,
+              timestamp: new Date().toISOString(),
+              // Utilise les informations de l'utilisateur connecté pour l'auteur du post
+              username: currentUser.pseudo || 'Utilisateur Azerty',
+              verified: currentUser.isPro || false // Supposons qu'isPro indique un statut vérifié pour la démo
+          };
+
+          try {
+              await addDoc(postsCollection, newPost); 
+              console.log("Post ajouté avec succès à Firebase !");
+          } catch (e) {
+              console.error("Erreur lors de l'ajout du post : ", e);
+              alert("Une erreur est survenue lors de la publication. Regardez la console du navigateur (F12) pour plus de détails.");
+          }
+
+          postModal.style.display = 'none';
+          postText.value = '';
+          postImage.value = '';
+      }
+    </script>
+    </body>
+</html>
